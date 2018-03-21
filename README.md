@@ -1,21 +1,21 @@
-#Guest
-attributes:
+##Guest
+#attributes:
   - name (req)
   - email (req)
-checks:
+#checks:
   - not null
   - valid email regex
-#Restaurant
-attributes:
+##Restaurant
+#attributes:
   - name (req)
   - email (req)
   - phone (req)
-checks:
+#checks:
   - not null
   - valid email regex
   - valid phone number regex
-#Shifts
-attributes:
+##Shifts
+#attributes:
   - start-time (req)
   - end-time   (req)
   - Restaurant_id (req)
