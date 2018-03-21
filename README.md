@@ -1,37 +1,37 @@
-##Guest
-#attributes:
+# Guest
+## attributes:
   - name (req)
   - email (req)
-#checks:
+## checks:
   - not null
   - valid email regex
-##Restaurant
-#attributes:
+# Restaurant
+## attributes:
   - name (req)
   - email (req)
   - phone (req)
-#checks:
+## checks:
   - not null
   - valid email regex
   - valid phone number regex
-##Shifts
-#attributes:
+# Shifts
+## attributes:
   - start-time (req)
   - end-time   (req)
   - Restaurant_id (req)
-checks:
+## checks:
   - not null
   - start-time < end-time
-#Tables
-attributes:
+# Tables
+## attributes:
   - name (req)
   - Minimum (req)
   - Maximum (req)
   - Restaurant_id (req)
-checks:
+## checks:
   - not null
   - Min > 0
-#Reservations
+# Reservations
   - Restaurant_id (req)
   - Guest_id (req)
   - Table_id (req)
@@ -44,11 +44,11 @@ checks:
   - Restaurant.shift.start-time < reservation_time < Restaurant.shift.end-time
   - No other reservations at this time for this table at this Restaurant
 
-#API Endpoint 1 - Create a reservation.
+# API Endpoint 1 - Create a reservation.
     - Send email with reservation details to guest
     - Send email to Restaurant with guest details
 
-#API Endpoint 2 - Update a reservation.
+# API Endpoint 2 - Update a reservation.
     - Send email with reservation details to guest with old and new times
 
 #API Endpoint 3 - Get all Restaurant reservations.
