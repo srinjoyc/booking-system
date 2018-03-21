@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  restaurant: one
+  guest: one
+  restaurant_table: one
+  restaurant_shift: one
+  guest_count: 1
+  reservation_time: 2018-03-20
+
+two:
+  restaurant: two
+  guest: two
+  restaurant_table: two
+  restaurant_shift: two
+  guest_count: 1
+  reservation_time: 2018-03-20
