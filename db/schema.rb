@@ -39,8 +39,8 @@ ActiveRecord::Schema.define(version: 20180321015147) do
 
   create_table "restaurant_shifts", force: :cascade do |t|
     t.bigint "restaurant_id"
-    t.date "start_time"
-    t.date "end_time"
+    t.integer "start_time"
+    t.integer "end_time"
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

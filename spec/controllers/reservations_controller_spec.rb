@@ -21,6 +21,12 @@ RSpec.describe ReservationsController, type: :controller do
         minimum_count: 3,
         maximum_count: 5
       })
+      @shift = RestaurantShift.create!({
+        name: 'Morning',
+        restaurant_id: @restaurant.id,
+        start_time: 9,
+        end_time: 13
+      })
     end
 
     context 'no conflicts for the reservation' do
