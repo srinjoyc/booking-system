@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20180321015147) do
     t.bigint "restaurant_table_id"
     t.bigint "restaurant_shift_id"
     t.integer "guest_count"
-    t.date "reservation_time"
+    t.integer "reservation_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["guest_id"], name: "index_reservations_on_guest_id"

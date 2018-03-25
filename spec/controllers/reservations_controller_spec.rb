@@ -31,7 +31,19 @@ RSpec.describe ReservationsController, type: :controller do
 
     context 'no conflicts for the reservation' do
       it 'creates a reservation at the restaurant.' do
-        expect(Restaurant.count).to eq(1)
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: @guest.id,
+            guest_count: 4,
+            reservation_time: 5
+          }
+        }
+        post :create, params: params
+        puts json response
+        expect(Reservation.count).to eq(1)
       end
     end
 
