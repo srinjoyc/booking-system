@@ -26,7 +26,6 @@ describe 'Get a specific user by id' do
     it 'returns a not found error' do
       get :show, params: {:id => "1000"}
       resp = json(response)
-      puts resp
       expect(resp.key?('error')).to eq(true)
       expect(resp['error']).to eq("Couldn\'t find Guest with 'id'=1000")
     end
@@ -106,7 +105,6 @@ end
         }
         post :create, params: params
         resp = json(response)
-        puts resp
         # EXPECTED: {"email"=>["has already been taken"]}
         expect(resp.key?('name')).to eq(true)
         expect(resp['name'][0]).to eq("can't be blank")
