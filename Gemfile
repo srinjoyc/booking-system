@@ -40,7 +40,9 @@ group :development do
   gem 'database_cleaner'
   gem 'factory_girl'
   gem 'faker'
+  gem 'rails_admin', '~> 1.3'
 end
 
+gem 'simplecov', require: false, group: :test
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

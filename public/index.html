@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Reservation System</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha18/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha18/css/tempusdominus-bootstrap-4.min.css" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1 class="display-3">UMAI Reservation System</h1>
+      <p class="lead">Create a guest, and book!</p>
+      <hr class="m-y-md">
+      <p>Created by: Srinjoy Chakraborty</p>
+    </div>
+    <div id="error-alert" class="alert alert-danger hidden" role="alert">
+      <strong>Oh snap!</strong>
+      <ul id="errors">
+      </ul>
+    </div>
+  </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h3> Register as a Guest</h3>
+          <form id="guest-form">
+            <div class="form-group">
+              <label for="guest-email">Email address</label>
+              <input type="email" class="form-control" id="guest-email" aria-describedby="emailHelp" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label for="guest-name">Name</label>
+              <input type="name" class="form-control" id="guest-name" placeholder="Full Name">
+            </div>
+            <button id="guest-submit" type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+        <div class="col-md-6">
+          <h3> Make a reservation </h3>
+          <form id="reservation-form">
+            <div class="form-group">
+              <label for="restaurant-reservation">Select a restaurant</label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="restaurant-reservation">Restaurant</label>
+                </div>
+                <select class="custom-select" id="restaurant-select">
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="reservation-email">Email address</label>
+              <input type="email" class="form-control" id="reservation-email" aria-describedby="emailHelp" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label for="reservation-time">Reservation Date & Time</label>
+                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="reservation-guest-count">Guest Count</label>
+              <input type="number" class="form-control" id="reservation-guest-count" placeholder="# of guests">
+            </div>
+            <button id="guest-submit" type="submit" class="btn btn-success">Reserve</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="container hidden table-container">
+      <div class="col-sm-12 text-center">
+        <table id="table">
+        </table>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+    $(function(){
+      //ERRORS
+        handleError = function(xhr, status, error) {
+          const errors = xhr.responseJSON
+          $.each(Object.keys(errors), function(index, value) {
+            $("#errors").append("<li> The " + value + " " + errors[value]+ "</li>")
+          })
+          $("#error-alert").removeClass("hidden")
+          console.log(xhr);
+        }
+      // SUBMIT GUEST FORM
+        $('#guest-form').submit(function(e){
+          e.preventDefault();
+          const data = {
+            guest: {
+              name: $('#guest-name').val(),
+              email: $('#guest-email').val()
+            }
+          }
+          console.log(data);
+          $.post( "/guests", data)
+              .done(function(resp){
+                console.log(resp);
+              })
+              .fail(function(xhr, status, error){
+                handleError(xhr, status, error)
+              })
+        });
+        // DISPLAY ALL Restaurant
+        loadRestaurants = function() {
+          $.get( "/restaurants")
+              .done(function(resp){
+                setRestaurantOptions(resp)
+              })
+              .fail(function(xhr, status, error){
+                handleError(xhr, status, error)
+              })
+        }
+
+        // Sets the 'select' menu.
+        setRestaurantOptions = function(resp) {
+          $.each(resp, function(index, value) {
+            $("#restaurant-select").append("<option value=\"" + value.id + "\">" + value.name + "</option>")
+          })
+        }
+        // SUBMIT RESERVATION FORM
+          $('#reservation-form').submit(function(e){
+            e.preventDefault();
+            const data = {
+              reservation: {
+                restaurant_id: $('#restaurant-select').val(),
+                guest_email: $('#reservation-email').val(),
+                guest_count: $('#reservation-guest-count').val(),
+                reservation_time: moment($('.datetimepicker-input').val()).format("DD.MM.YYYY HH:mm")
+              }
+            }
+            console.log(data);
+            $.post( "/reservations", data)
+                .done(function(resp){
+                  console.log(resp);
+                })
+                .fail(function(xhr, status, error){
+                  handleError(xhr, status, error)
+                })
+          });
+        // Populate options in reservations select fields.
+        loadRestaurants()
+        //initialize date picker
+        $('#datetimepicker1').datetimepicker({
+          format: 'DD.HHmm',
+        });
+    })
+    </script>
+  </body>
+</html>

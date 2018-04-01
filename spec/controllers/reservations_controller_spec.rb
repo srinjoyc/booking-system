@@ -27,10 +27,35 @@ RSpec.describe ReservationsController, type: :controller do
         start_time: 9,
         end_time: 13
       })
+      @reservation = Reservation.create!({
+          restaurant_id: @restaurant.id,
+          restaurant_table_id: @table.id,
+          restaurant_shift_id: @shift.id,
+          guest_id: @guest.id,
+          guest_count: 4,
+          reservation_time: 9
+        })
     end
 
-    context 'no conflicts for the reservation' do
+    context 'all details are valid and no conflicting reservations' do
       it 'creates a reservation at the restaurant.' do
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: @guest.id,
+            guest_count: 4,
+            reservation_time: 7
+          }
+        }
+        post :create, params: params
+        expect(Reservation.count).to eq(2)
+      end
+    end
+
+    context 'there are existing conflicts or invalid fields' do
+      it 'gives an error if there is a conflicting reservation' do
         params = {
           reservation: {
             restaurant_id: @restaurant.id,
@@ -42,20 +67,9 @@ RSpec.describe ReservationsController, type: :controller do
           }
         }
         post :create, params: params
-        puts json response
         expect(Reservation.count).to eq(1)
       end
     end
-
-    # context 'user not in db - invalid id' do
-    #   it 'returns a not found error' do
-    #     get :show, params: {:id => "1000"}
-    #     resp = json(response)
-    #     puts resp
-    #     expect(resp.key?('error')).to eq(true)
-    #     expect(resp['error']).to eq("Couldn\'t find Guest with 'id'=1000")
-    #   end
-    # end
 
   end
 

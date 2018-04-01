@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180321015147) do
+ActiveRecord::Schema.define(version: 20180330132418) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,13 +28,25 @@ ActiveRecord::Schema.define(version: 20180321015147) do
     t.bigint "restaurant_table_id"
     t.bigint "restaurant_shift_id"
     t.integer "guest_count"
-    t.integer "reservation_time"
+    t.datetime "reservation_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["guest_id"], name: "index_reservations_on_guest_id"
     t.index ["restaurant_id"], name: "index_reservations_on_restaurant_id"
     t.index ["restaurant_shift_id"], name: "index_reservations_on_restaurant_shift_id"
     t.index ["restaurant_table_id"], name: "index_reservations_on_restaurant_table_id"
+  end
+
+  create_table "reserved_tables", force: :cascade do |t|
+    t.bigint "restaurant_id"
+    t.bigint "restaurant_table_id"
+    t.bigint "reservation_id"
+    t.datetime "reservation_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reservation_id"], name: "index_reserved_tables_on_reservation_id"
+    t.index ["restaurant_id"], name: "index_reserved_tables_on_restaurant_id"
+    t.index ["restaurant_table_id"], name: "index_reserved_tables_on_restaurant_table_id"
   end
 
   create_table "restaurant_shifts", force: :cascade do |t|
@@ -69,6 +81,9 @@ ActiveRecord::Schema.define(version: 20180321015147) do
   add_foreign_key "reservations", "restaurant_shifts"
   add_foreign_key "reservations", "restaurant_tables"
   add_foreign_key "reservations", "restaurants"
+  add_foreign_key "reserved_tables", "reservations"
+  add_foreign_key "reserved_tables", "restaurant_tables"
+  add_foreign_key "reserved_tables", "restaurants"
   add_foreign_key "restaurant_shifts", "restaurants"
   add_foreign_key "restaurant_tables", "restaurants"
 end

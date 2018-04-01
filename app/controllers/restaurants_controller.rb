@@ -3,8 +3,19 @@ class RestaurantsController < ApplicationController
 
   # GET /restaurants
   def index
-    @restaurants = Restaurant.all
-
+    @restaurants =
+      Restaurant.joins(:restaurant_shifts,:restaurant_tables)
+        .select("restaurant_shifts.start_time,
+                restaurant_shifts.end_time,
+                restaurant_shifts.name as shift_name,
+                restaurant_tables.name as table_name,
+                restaurant_tables.minimum_count,
+                restaurant_tables.maximum_count,
+                restaurants.id,
+                restaurants.name,
+                restaurants.email,
+                restaurants.phone_number
+                ")
     render json: @restaurants
   end
 
