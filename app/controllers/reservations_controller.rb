@@ -1,6 +1,6 @@
 class ReservationsController < ApplicationController
   before_action :set_reservation, only: [:show, :update, :destroy]
-  before_action :verify_guest, only: [:create, :update]
+  before_action :verify_guest, only: :create
   # GET /reservations
   def index
     @reservations = Reservation.all
@@ -15,9 +15,7 @@ class ReservationsController < ApplicationController
 
   #POST /mobile-reservations
   def mobile_create
-    #:restaurant_id, :restaurant_table,
-    #:restaurant_shift,:reservation_time,
-    #:guest_id, :guest_count
+
     request = mobile_create_params
     restaurant = Restaurant.find(request[:restaurant_id])
     reserved_table_ids = Reservation.get_reserved_tables request[:restaurant_id], request[:reservation_time].to_time
@@ -59,44 +57,43 @@ class ReservationsController < ApplicationController
   end
   # POST /reservations
   def create
-    #santatize params
+    # @guest initialized below in verify_guest
     request = create_reservation_params
-
     restaurant = Restaurant.find(request[:restaurant_id])
-    puts request[:reservation_time].to_time.in_time_zone('Eastern Time (US & Canada)')
-    table = Reservation.get_table(restaurant.id, request[:reservation_time].in_time_zone('Eastern Time (US & Canada)'), request[:guest_count])
+    table = Reservation.get_table request[:restaurant_id], request[:reservation_time].to_time, request[:guest_count]
+    puts table.to_json
+    if table.nil?
+      render json: {restaurant: 'does not have that table at that time'}, status: :unprocessable_entity
+      return
+    end
+
     shift = restaurant.get_shift request[:reservation_time].to_time
-    if table.nil? || shift.nil?
-      msg = ""
-      msg += "has no tables available at that time" if table.nil?
-      msg += "is not open at that time. #{RestaurantShift.restaurant_shift_string restaurant.id}" if shift.nil?
-      error = {
-        restaurant: msg
-      }
-      render json: error, status: :unprocessable_entity
+    if shift.nil?
+      render json: {error:restaurant.errors, restaurant: RestaurantShift.restaurant_shift_string(request[:restaurant_id])}, status: :unprocessable_entity
       return
     end
 
     @reservation = Reservation.new({
-        restaurant_id: restaurant.id,
+        restaurant_id: request[:restaurant_id],
         guest_id: @guest.id,
         restaurant_table_id: table.id,
         restaurant_shift_id: shift.id,
         guest_count: request[:guest_count],
         reservation_time: request[:reservation_time].to_time
       })
-
     if @reservation.save
       Reservation.reserve_table @reservation, table
       render json: @reservation, status: :created, location: @reservation
     else
       render json: @reservation.errors, status: :unprocessable_entity
     end
+
   end
 
   # PATCH/PUT /reservations/1
   def update
-    if @reservation.update(reservation_params)
+    request = update_reservation_params
+    if @reservation.update(request)
       render json: @reservation
     else
       render json: @reservation.errors, status: :unprocessable_entity
@@ -120,6 +117,10 @@ class ReservationsController < ApplicationController
 
     def create_reservation_params
       params.require(:reservation).permit(:restaurant_id, :guest_email, :guest_count,:reservation_time)
+    end
+
+    def update_reservation_params
+      params.require(:reservation).permit(:guest_count,:reservation_time,:restaurant_table_id, :restaurant_shift_id)
     end
 
     def mobile_create_params

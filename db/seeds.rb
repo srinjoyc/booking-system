@@ -81,8 +81,7 @@
       name: "All Day"
     })
 
-  reservation_time = "31.03.2018 12:30 -0700".to_time
-  puts  reservation_time
+  reservation_time = "Wed, 11 Jul 2012 8:10:00 GMT".to_time
   reservation_one = Reservation.create({
       restaurant_id: restaurant_one.id,
       guest_id: guest_one.id,
