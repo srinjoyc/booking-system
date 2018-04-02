@@ -148,7 +148,7 @@
                 restaurant_id: $('#restaurant-select').val(),
                 guest_email: $('#reservation-email').val(),
                 guest_count: $('#reservation-guest-count').val(),
-                reservation_time: moment($('.datetimepicker-input').val()).format("DD.MM.YYYY HH:mm")
+                reservation_time: moment($('.datetimepicker-input').val()).format("DD.MM.YYYY HH:mm") + " +0700"
               }
             }
             console.log(data);

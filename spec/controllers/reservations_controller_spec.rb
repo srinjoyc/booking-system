@@ -33,11 +33,11 @@ RSpec.describe ReservationsController, type: :controller do
           restaurant_shift_id: @shift.id,
           guest_id: @guest.id,
           guest_count: 4,
-          reservation_time: 9
+          reservation_time: "Wed, 11 Jul 2012 8:10:00"
         })
     end
 
-    context 'all details are valid and no conflicting reservations' do
+    context 'all details are valid and no conflicting reservations during creation' do
       it 'creates a reservation at the restaurant.' do
         params = {
           reservation: {
@@ -46,15 +46,15 @@ RSpec.describe ReservationsController, type: :controller do
             restaurant_shift_id: @shift.id,
             guest_id: @guest.id,
             guest_count: 4,
-            reservation_time: 7
+            reservation_time: "Wed, 11 Jul 2012 9:10:00"
           }
         }
-        post :create, params: params
+        post :mobile_create, params: params
         expect(Reservation.count).to eq(2)
       end
     end
 
-    context 'there are existing conflicts or invalid fields' do
+    context 'there are existing conflicts or invalid fields during creation' do
       it 'gives an error if there is a conflicting reservation' do
         params = {
           reservation: {
@@ -63,12 +63,79 @@ RSpec.describe ReservationsController, type: :controller do
             restaurant_shift_id: @shift.id,
             guest_id: @guest.id,
             guest_count: 4,
-            reservation_time: 5
+            reservation_time: "Wed, 11 Jul 2012 8:30:00" # same time as existing resevation
           }
         }
-        post :create, params: params
+        post :mobile_create, params: params
+        resp = json(response)
+        expect(resp.key?('error')).to eq(true)
         expect(Reservation.count).to eq(1)
       end
+      it 'gives an error if the reservation time is not during any of a restaurants shift' do
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: @guest.id,
+            guest_count: 4,
+            reservation_time: "Wed, 11 Jul 2012 14:30:00" # same time as existing resevation
+          }
+        }
+        post :mobile_create, params: params
+        resp = json(response)
+        expect(resp.key?('error')).to eq(true)
+        expect(Reservation.count).to eq(1)
+      end
+
+      it 'gives an error if the guest count is above the maximum for the table' do
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: @guest.id,
+            guest_count: 8,
+            reservation_time: "Wed, 11 Jul 2012 9:10:00" # same time as existing resevation
+          }
+        }
+        post :mobile_create, params: params
+        resp = json(response)
+        expect(Reservation.count).to eq(1)
+      end
+
+      it 'gives an error if the guest count is below the minimum for the table' do
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: @guest.id,
+            guest_count: 1,
+            reservation_time: "Wed, 11 Jul 2012 9:10:00" # same time as existing resevation
+          }
+        }
+        post :mobile_create, params: params
+        resp = json(response)
+        expect(Reservation.count).to eq(1)
+      end
+
+      it 'gives an error if any of the ids do not exist' do
+        params = {
+          reservation: {
+            restaurant_id: @restaurant.id,
+            restaurant_table_id: @table.id,
+            restaurant_shift_id: @shift.id,
+            guest_id: 100,
+            guest_count: 1,
+            reservation_time: "Wed, 11 Jul 2012 9:10:00" # same time as existing resevation
+          }
+        }
+        post :mobile_create, params: params
+        resp = json(response)
+        expect(Reservation.count).to eq(1)
+      end
+
     end
 
   end

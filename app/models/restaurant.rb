@@ -8,9 +8,7 @@ class Restaurant < ApplicationRecord
 
     def get_shift time
       hour = time.hour
-      puts "-----------------"
-      puts hour
-      shift = self.restaurant_shifts.where("start_time >= ? AND end_time >= ?", hour, hour + 1).first
+      shift = self.restaurant_shifts.where("start_time <= ? AND end_time >= ?", hour, hour + 1).first
     end
 
 end

@@ -52,7 +52,7 @@
     shift_two = RestaurantShift.create({
         restaurant_id: restaurant_two.id,
         start_time: 12,
-        end_time: 4,
+        end_time: 16,
         name: "Evening Shift"
       })
 
@@ -76,7 +76,7 @@
     })
   shift_three = RestaurantShift.create({
       restaurant_id: restaurant_two.id,
-      start_time: 4,
+      start_time: 16,
       end_time: 24,
       name: "All Day"
     })

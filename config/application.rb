@@ -18,12 +18,10 @@ Bundler.require(*Rails.groups)
 
 module BookingSystem
   class Application < Rails::Application
+    config.time_zone = 'Eastern Time (US & Canada)'
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
-    config.session_store :cookie_store
-    config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, config.session_options
-    config.middleware.use Rack::MethodOverride
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

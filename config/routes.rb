@@ -7,5 +7,6 @@ Rails.application.routes.draw do
   resources :restaurant_shifts
   resources :restaurant_tables
 
-  get '*other', to: 'static#index'
+  post '/mobile-create-reservation', to: 'reservations#mobile_create'
+  get '/', to: 'static#index'
 end
