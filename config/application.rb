@@ -18,7 +18,7 @@ Bundler.require(*Rails.groups)
 
 module BookingSystem
   class Application < Rails::Application
-    config.time_zone = 'Eastern Time (US & Canada)'
+    config.time_zone = 'GMT'
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
 

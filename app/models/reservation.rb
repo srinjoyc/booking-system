@@ -65,8 +65,8 @@ private
     # table change
     if current_reservation.restaurant_table_id != self.restaurant_table_id
       reserved_table_ids = Reservation.get_reserved_tables self.restaurant_id, self.reservation_time
-      not_reserved_table = reserved_table_ids.include?(self.restaurant_table_id)
-      if !not_reserved_table
+      reserved_table = reserved_table_ids.include?(self.restaurant_table_id)
+      if reserved_table
         self.errors.add(:update, "Table already booked")
         raise ActiveRecord::Rollback
       end
@@ -74,7 +74,7 @@ private
     # shift change
     if current_reservation.restaurant_shift_id != self.restaurant_shift_id
       shift = restaurant.get_shift self.reservation_time
-      correct_shift = (shift == self.restaurant_shift_id)
+      correct_shift = (shift == self.restaurant_shift)
       if !correct_shift
         self.errors.add(:update, "Restaurant doest not have a shift during your reservation time")
         raise ActiveRecord::Rollback
@@ -87,9 +87,9 @@ private
                           .where(reservation_time: self.reservation_time - 3600...self.reservation_time + 3600)
                           .where(restaurant_table_id: self.restaurant_table_id)
                           .where.not(reservation_id: self.id)
-      puts reserved_tables.to_json
+
       shift = restaurant.get_shift self.reservation_time
-      correct_shift = (shift == self.restaurant_shift_id)
+      correct_shift = (shift == self.restaurant_shift)
       if !reserved_tables.empty? || !correct_shift
         self.errors.add(:update, "The table is not available at the requested time")
         raise ActiveRecord::Rollback

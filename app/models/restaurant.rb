@@ -10,5 +10,5 @@ class Restaurant < ApplicationRecord
       hour = time.hour
       shift = self.restaurant_shifts.where("start_time <= ? AND end_time >= ?", hour, hour + 1).first
     end
-
+    #Wed, 11 Jul 2012 08:30:00 GMT +00:00, res_id: 8
 end

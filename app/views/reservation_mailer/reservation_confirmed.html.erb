@@ -1,0 +1,9 @@
+
+    <h1>Welcome to umai.com, <%= @guest.name %></h1>
+    <p>
+      You have successfully book a reservation on, : <%= @reservation.reservation_time %>.<br>
+    </p>
+    <p>
+      Your table is:  <%= @reservation.restaurant_table.name %>, with <%= @reservation.guest_count %> total guests.
+    </p>
+    <p>Thanks for using UMAI and have a great day!</p>

@@ -4,8 +4,18 @@ class ReservationsController < ApplicationController
   # GET /reservations
   def index
     @reservations = Reservation.all
-
     render json: @reservations
+  end
+
+  # GET reservations/restaurant/:id
+  def restaurants
+    restaurant = Restaurant.find(params[:id])
+    restaurant_reservations = Reservation.joins(:guest, :restaurant_table)
+                                .select("reservation_time,
+                                         guest_count,
+                                         guests.name as guest_name,
+                                         restaurant_tables.name as table_name")
+    render json: restaurant_reservations.to_json
   end
 
   # GET /reservations/1
@@ -18,6 +28,7 @@ class ReservationsController < ApplicationController
 
     request = mobile_create_params
     restaurant = Restaurant.find(request[:restaurant_id])
+    guest = Guest.find(request[:guest_id])
     reserved_table_ids = Reservation.get_reserved_tables request[:restaurant_id], request[:reservation_time].to_time
     if reserved_table_ids.to_json.include?(request[:restaurant_table_id])
       table = nil
@@ -42,7 +53,7 @@ class ReservationsController < ApplicationController
 
     @reservation = Reservation.new({
         restaurant_id: request[:restaurant_id],
-        guest_id: request[:guest_id],
+        guest_id: guest.id,
         restaurant_table_id: table.id,
         restaurant_shift_id: shift.id,
         guest_count: request[:guest_count],
@@ -50,6 +61,7 @@ class ReservationsController < ApplicationController
       })
       if @reservation.save
         Reservation.reserve_table @reservation, table
+        ReservationMailer.reservation_confirmed(@reservation).deliver_later
         render json: @reservation, status: :created, location: @reservation
       else
         render json: @reservation.errors, status: :unprocessable_entity
@@ -83,6 +95,7 @@ class ReservationsController < ApplicationController
       })
     if @reservation.save
       Reservation.reserve_table @reservation, table
+      ReservationMailer.reservation_confirmed(@reservation).deliver_later
       render json: @reservation, status: :created, location: @reservation
     else
       render json: @reservation.errors, status: :unprocessable_entity
