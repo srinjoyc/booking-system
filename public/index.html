@@ -25,6 +25,11 @@
       <hr class="m-y-md">
       <p>Created by: Srinjoy Chakraborty</p>
     </div>
+    <div id="success-alert" class="alert alert-success hidden" role="alert">
+      <strong>Reservation Confirmed!</strong>
+      <ul id="success-details">
+      </ul>
+    </div>
     <div id="error-alert" class="alert alert-danger hidden" role="alert">
       <strong>Oh snap!</strong>
       <ul id="errors">
@@ -105,6 +110,17 @@
           $("#error-alert").removeClass("hidden")
           console.log(xhr);
         }
+        handleSuccess = function(resp) {
+          const success = resp
+          console.log(resp)
+          $.each(Object.keys(success), function(index, value) {
+            $("#success-details").append("<li> The " + value + " " + success[value]+ "</li>")
+          })
+          $("#success-alert").removeClass("hidden")
+          $("#error-alert").addClass("hidden")
+          setTimeout(function(){ $("#success-alert").addClass("hidden") }, 6000);
+          console.log(resp);
+        }
       // SUBMIT GUEST FORM
         $('#guest-form').submit(function(e){
           e.preventDefault();
@@ -154,6 +170,7 @@
             console.log(data);
             $.post( "/reservations", data)
                 .done(function(resp){
+                  handleSuccess(resp)
                   console.log(resp);
                 })
                 .fail(function(xhr, status, error){
